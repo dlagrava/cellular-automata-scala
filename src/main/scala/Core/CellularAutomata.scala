@@ -1,8 +1,8 @@
 package Core
 
-import scala.language.postfixOps
+import scala.reflect.ClassTag
 
-class CellularAutomata[T](
+class CellularAutomata[T: ClassTag](
     xSize: Int,
     ySize: Int,
     neighborhood: Neighborhood,
@@ -13,7 +13,11 @@ class CellularAutomata[T](
 ) {
   private val board: Board[T] = Board[T](xSize, ySize, neighborhood.halo, initial)
   private val tmpBoard: Board[T] = Board[T](xSize, ySize, neighborhood.halo, initial)
-  private var generation: Int = 0
+  private var _generation: Int = 0
+
+  def generation: Int = _generation
+  def width: Int = xSize
+  def height: Int = ySize
 
   def init(): Unit = {
     initializer.initialize(board)
@@ -22,14 +26,19 @@ class CellularAutomata[T](
     tmpBoard.copyFromBoard(board)
   }
 
+  def step(): Unit = {
+    _generation += 1
+    applyRule()
+    board.copyFromBoard(tmpBoard)
+    boundaryCondition.apply(board)
+  }
+
   def evolve(maxIterations: Int): Unit =
-    while (generation < maxIterations) {
-      generation += 1
-      applyRule()
-      board.copyFromBoard(tmpBoard)
-      boundaryCondition.apply(board)
-      if (generation % 10 == 0) println(s"Generation: $generation, board: ${board.printBoard()}")
+    while (_generation < maxIterations) {
+      step()
     }
+
+  def snapshot(): Array[Array[T]] = board.snapshot()
 
   def applyRule(): Unit = {
     for {

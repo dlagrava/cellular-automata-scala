@@ -1,8 +1,9 @@
 package Core
 
+import scala.reflect.ClassTag
 import scala.util.Random
 
-class Board[T](sizeX: Int, sizeY: Int, haloSize: Int, initial: T) {
+class Board[T: ClassTag](sizeX: Int, sizeY: Int, haloSize: Int, initial: T) {
   private val internalXSize = sizeX + 2 * haloSize
   private val internalYSize = sizeY + 2 * haloSize
   private val nodes: Array[Array[Node[T]]] =
@@ -50,6 +51,10 @@ class Board[T](sizeX: Int, sizeY: Int, haloSize: Int, initial: T) {
   def getXSize: Int = sizeX
   def getYSize: Int = sizeY
 
+  /** Interior values only (no halo). Fresh copy for views. */
+  def snapshot(): Array[Array[T]] =
+    Array.tabulate(sizeX, sizeY)((x, y) => getNode(x, y).value)
+
   def setNeighborhood(neighborhood: Neighborhood): Unit = {
     for {
       x <- 0 until sizeX
@@ -78,14 +83,27 @@ trait BoardInitializer[T] {
   def initialize(board: Board[T]): Unit
 }
 
-class RandomInitializer(range: Int) extends BoardInitializer[Int] {
+class RandomInitializer(maxValue: Int) extends BoardInitializer[Int] {
   override def initialize(board: Board[Int]): Unit = {
     val rand = new Random
     for {
       x <- 0 until board.getXSize
       y <- 0 until board.getYSize
     } {
-      board.setNode(x, y, Node[Int](rand.nextInt(range)))
+      board.setNode(x, y, Node[Int](rand.nextInt(maxValue)))
     }
+  }
+}
+
+class SquareInitializer(value: Int, size: Int) extends BoardInitializer[Int] {
+  override def initialize(board: Board[Int]): Unit = {
+    val middleX = board.getXSize / 2
+    val middleY = board.getYSize / 2
+    val squareIndexes = 
+      for {
+        x <- List.range(middleX - size / 2, middleX + size / 2)
+        y <- List.range(middleY - size / 2, middleY + size / 2)
+      } yield (x, y)
+    board.setNodes(squareIndexes, squareIndexes.map(x => Node[Int](value)))
   }
 }
