@@ -49,11 +49,11 @@ class CellularAutomata[T: ClassTag](
     }
   }
 
+  def ruleName: String = rule.name
+
   def applyRule(x: Int, y: Int): Unit = {
-    val neighbors = neighborhood.getNeighbors(x, y)
-    val neigborsValues: List[Node[T]] =
-      neighbors.map(n => board.getNode(n._1, n._2))
-    val newValue = rule.apply(neigborsValues)
-    tmpBoard.setNode(x, y, newValue)
+    val cell = board.node(x, y)
+    val neighborNodes = cell.neighbors.map { case (nx, ny) => board.node(nx, ny) }
+    tmpBoard.node(x, y).value = rule.apply(neighborNodes)
   }
 }
