@@ -10,7 +10,7 @@ class ConwayRuleTest extends FunSuite {
     val rule = new ConwayRule()
     val state = List(Node[Int](1), Node[Int](0), Node[Int](1), Node[Int](1))
     val result = rule.apply(state)
-    assertEquals(result.value, 1)
+    assertEquals(result, 1)
   }
 
   test(
@@ -20,7 +20,7 @@ class ConwayRuleTest extends FunSuite {
     val state =
       List(Node[Int](1), Node[Int](0), Node[Int](1), Node[Int](1), Node[Int](1))
     val result = rule.apply(state)
-    assertEquals(result.value, 1)
+    assertEquals(result, 1)
   }
 
   test(
@@ -29,7 +29,7 @@ class ConwayRuleTest extends FunSuite {
     val rule = new ConwayRule()
     val state = List(Node[Int](1), Node[Int](0), Node[Int](0), Node[Int](1))
     val result = rule.apply(state)
-    assertEquals(result.value, 0)
+    assertEquals(result, 0)
   }
 
   test(
@@ -45,7 +45,7 @@ class ConwayRuleTest extends FunSuite {
       Node[Int](1)
     )
     val result = rule.apply(state)
-    assertEquals(result.value, 0)
+    assertEquals(result, 0)
   }
 
   test(
@@ -55,7 +55,7 @@ class ConwayRuleTest extends FunSuite {
     val state =
       List(Node[Int](0), Node[Int](0), Node[Int](1), Node[Int](1), Node[Int](1))
     val result = rule.apply(state)
-    assertEquals(result.value, 1)
+    assertEquals(result, 1)
   }
 
   test(
@@ -71,7 +71,7 @@ class ConwayRuleTest extends FunSuite {
       Node[Int](1)
     )
     val result = rule.apply(state)
-    assertEquals(result.value, 0)
+    assertEquals(result, 0)
   }
 
   test(
@@ -87,7 +87,7 @@ class ConwayRuleTest extends FunSuite {
       Node[Int](1)
     )
     val result = rule.apply(state)
-    assertEquals(result.value, 0)
+    assertEquals(result, 0)
   }
 
 }

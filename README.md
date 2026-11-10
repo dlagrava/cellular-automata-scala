@@ -1,13 +1,14 @@
 # Cellular Automata in Scala
 
-Generic 2D cellular automata on Scala 3.
+Generic 2D cellular automata on Scala 3, with a ScalaFX visualizer.
 
 ## Features
 
 - Pluggable **rules**: Conway, diffusion, parity
 - **Neighborhoods**: Moore, von Neumann
 - **Boundary conditions**: periodic, fixed-value
-- Board initializers (e.g. random)
+- Board initializers (e.g. random, square)
+- Live **ScalaFX** view (`AutomataView` + color maps)
 
 ## Run
 
@@ -15,7 +16,12 @@ Generic 2D cellular automata on Scala 3.
 sbt run
 ```
 
-Default demo: 30×30 Conway board, Moore neighborhood, periodic boundaries, 100 generations.
+Opens a 256×256 window (3px cells). Default demo: parity rule, Moore neighborhood, periodic boundaries, centered square seed.
+
+| Key | Action |
+|-----|--------|
+| Space | Pause / resume |
+| R | Re-init board |
 
 ## Test
 

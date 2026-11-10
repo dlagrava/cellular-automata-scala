@@ -38,11 +38,11 @@ object AutomataApp extends JFXApp3:
         lastTickNs = now
         ca.step()
         view.render(ca.generation, ca.snapshot())
-        stage.title = s"Conway — gen ${ca.generation}${if paused then " (paused)" else ""}"
+        stage.title = s"${ca.ruleName}: gen ${ca.generation}${if paused then " (paused)" else ""}"
     }
 
     stage = new JFXApp3.PrimaryStage:
-      title = "Conway — gen 0"
+      title = s"${ca.ruleName}: gen 0"
       scene = new Scene(BoardSize * CellPx, BoardSize * CellPx):
         root = new StackPane:
           children = Seq(view.imageView)
@@ -51,12 +51,12 @@ object AutomataApp extends JFXApp3:
             case KeyCode.Space =>
               paused = !paused
               stage.title =
-                s"Conway — gen ${ca.generation}${if paused then " (paused)" else ""}"
+                s"${ca.ruleName}: gen ${ca.generation}${if paused then " (paused)" else ""}"
             case KeyCode.R =>
               ca.init()
               view.render(ca.generation, ca.snapshot())
               stage.title =
-                s"Conway — gen ${ca.generation}${if paused then " (paused)" else ""}"
+                s"${ca.ruleName}: gen ${ca.generation}${if paused then " (paused)" else ""}"
             case _ => ()
 
     view.render(ca.generation, ca.snapshot())
