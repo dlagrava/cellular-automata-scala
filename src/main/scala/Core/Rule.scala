@@ -19,9 +19,8 @@ class ConwayRule extends Rule[Int] {
 
 class DiffusionRule extends Rule[Double] {
   override def apply(neighbors: List[Node[Double]]): Node[Double] = {
-    val currentCell = neighbors.head
-    val sumNeighbors = neighbors.tail.map(_.getVal).sum
-    Node[Double](sumNeighbors / 4.0)
+    val sumNeighbors = neighbors.map(_.getVal).sum
+    Node[Double](sumNeighbors / 5.0)
   }
 }
 
