@@ -37,14 +37,14 @@ class PeriodicBoundaryCondition[T] extends BoundaryCondition[T] {
       if inHalo(x, y)
     } yield (x, y)
 
-    val sources = haloCells.map { case (x, y) => (wrap(x, sizeX), wrap(y, sizeY)) }
+    val sources = haloCells.map { case (x, y) =>
+      (wrap(x, sizeX), wrap(y, sizeY))
+    }
     board.setValues(haloCells, board.getValues(sources))
   }
 }
 
 class FixedValueBoundaryCondition[T] extends BoundaryCondition[T] {
   override val length: Int = 1
-  override def apply(board: Board[T]): Unit = {
-
-  }
+  override def apply(board: Board[T]): Unit = {}
 }

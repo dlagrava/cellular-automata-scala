@@ -11,8 +11,10 @@ class CellularAutomata[T: ClassTag](
     initializer: BoardInitializer[T],
     initial: T
 ) {
-  private val board: Board[T] = Board[T](xSize, ySize, neighborhood.halo, initial)
-  private val tmpBoard: Board[T] = Board[T](xSize, ySize, neighborhood.halo, initial)
+  private val board: Board[T] =
+    Board[T](xSize, ySize, neighborhood.halo, initial)
+  private val tmpBoard: Board[T] =
+    Board[T](xSize, ySize, neighborhood.halo, initial)
   private var _generation: Int = 0
 
   def generation: Int = _generation
@@ -53,7 +55,9 @@ class CellularAutomata[T: ClassTag](
 
   def applyRule(x: Int, y: Int): Unit = {
     val cell = board.node(x, y)
-    val neighborNodes = cell.neighbors.map { case (nx, ny) => board.node(nx, ny) }
+    val neighborNodes = cell.neighbors.map { case (nx, ny) =>
+      board.node(nx, ny)
+    }
     tmpBoard.node(x, y).value = rule.apply(neighborNodes)
   }
 }

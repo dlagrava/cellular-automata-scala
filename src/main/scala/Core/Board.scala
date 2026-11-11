@@ -9,7 +9,6 @@ class Board[T: ClassTag](sizeX: Int, sizeY: Int, haloSize: Int, initial: T) {
   private val nodes: Array[Array[Node[T]]] =
     Array.tabulate(internalXSize, internalYSize)((_, _) => Node[T](initial))
 
-  /** Logical coords: interior is [0, sizeX) x [0, sizeY); halo uses negatives / >= size. */
   private def toInternal(x: Int, y: Int): (Int, Int) =
     (x + haloSize, y + haloSize)
 
