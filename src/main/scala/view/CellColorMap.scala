@@ -21,13 +21,17 @@ class JetColorMap(min: Double, max: Double) extends CellColorMap[Double]:
         b = (255 * (normalizedValue + intervals(0)) / intervals(0) / 2).toInt
       case x if x < intervals(1) =>
         b = 255
-        g = ((normalizedValue - intervals(0)) * 255.0 / (intervals(1) - intervals(0))).toInt
+        g = ((normalizedValue - intervals(0)) * 255.0 /
+          (intervals(1) - intervals(0))).toInt
       case x if x < intervals(2) =>
-        b = ((-normalizedValue + intervals(2)) * 255.0 / (intervals(2) - intervals(1))).toInt
-        r = ((normalizedValue - intervals(2)) * 255.0 / (intervals(2) - intervals(1))).toInt
+        b = ((-normalizedValue + intervals(2)) * 255.0 /
+          (intervals(2) - intervals(1))).toInt
+        r = ((normalizedValue - intervals(2)) * 255.0 /
+          (intervals(2) - intervals(1))).toInt
         g = 0xff
       case x if x < intervals(3) =>
-        g = ((intervals(3) - normalizedValue) * 255.0 / (intervals(3) - intervals(2))).toInt
+        g = ((intervals(3) - normalizedValue) * 255.0 /
+          (intervals(3) - intervals(2))).toInt
         r = 0xff
       case _ =>
         r = 0xff
