@@ -10,7 +10,6 @@ class BinaryColorMap extends CellColorMap[Int]:
 
 class JetColorMap(min: Double, max: Double) extends CellColorMap[Double]:
   def toArgb(value: Double): Int =
-    val normalized = (value - min) / (max - min)
     val length = max - min
     val intervals = List(1.0 / 8.0, 5.0 / 16.0, 11.0 / 16.0, 14.0 / 16.0)
     val normalizedValue = (value - min) / length
@@ -36,4 +35,4 @@ class JetColorMap(min: Double, max: Double) extends CellColorMap[Double]:
       case _ =>
         r = 0xff
     }
-    (r << 16) | (g << 8) | b
+    0xff000000 | (r << 16) | (g << 8) | b

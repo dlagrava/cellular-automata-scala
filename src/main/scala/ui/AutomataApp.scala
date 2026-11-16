@@ -9,9 +9,10 @@ import scalafx.geometry.Insets
 import scalafx.scene.Scene
 import scalafx.event.ActionEvent
 import scalafx.scene.control.{Button, ComboBox, Label, Spinner}
+import scalafx.scene.image.ImageView
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import scalafx.scene.layout.{BorderPane, HBox, StackPane}
-import view.BinaryColorMap
+import view.{BinaryColorMap, JetColorMap}
 
 object AutomataApp extends JFXApp3:
 
@@ -23,53 +24,89 @@ object AutomataApp extends JFXApp3:
   private val FrameNs = 80_000_000L // ~12.5 Hz
   private val ControlBarHeight = 40
 
-  private def ruleFor(name: String): Rule[Int] =
-    name match
-      case "Conway" => new ConwayRule()
-      case _        => new ParityRule()
+  private trait LiveSim:
+    def generation: Int
+    def ruleName: String
+    def step(): Unit
+    def init(): Unit
+    def render(): Unit
+    def imageView: ImageView
 
-  private def buildCa(ruleName: String, size: Int): CellularAutomata[Int] =
+  private def intSim(rule: Rule[Int], size: Int): LiveSim =
     val ca = new CellularAutomata[Int](
       size,
       size,
       new MooreNeighborhood(),
-      ruleFor(ruleName),
+      rule,
       new PeriodicBoundaryCondition[Int](),
       new SquareInitializer(1, (0.1 * size).toInt),
       initial = 0
     )
     ca.init()
-    ca
+    val view = new ScalaFxView[Int](new BinaryColorMap, size, size, CellPx)
+    new LiveSim:
+      def generation = ca.generation
+      def ruleName = ca.ruleName
+      def step() = ca.step()
+      def init() = ca.init()
+      def render() = view.render(ca.generation, ca.snapshot())
+      def imageView = view.imageView
+
+  private def diffusionSim(size: Int): LiveSim =
+    val ca = new CellularAutomata[Double](
+      size,
+      size,
+      new VonNeumannNeighborhood(),
+      new DiffusionRule(),
+      new PeriodicBoundaryCondition[Double](),
+      new SquareInitializer(1.0, (0.1 * size).toInt),
+      initial = 0.0
+    )
+    ca.init()
+    val view =
+      new ScalaFxView[Double](new JetColorMap(0.0, 1.0), size, size, CellPx)
+    new LiveSim:
+      def generation = ca.generation
+      def ruleName = ca.ruleName
+      def step() = ca.step()
+      def init() = ca.init()
+      def render() = view.render(ca.generation, ca.snapshot())
+      def imageView = view.imageView
+
+  private def buildSim(ruleName: String, size: Int): LiveSim =
+    ruleName match
+      case "Conway"    => intSim(new ConwayRule(), size)
+      case "Diffusion" => diffusionSim(size)
+      case _           => intSim(new ParityRule(), size)
 
   override def start(): Unit =
     var currentRule = "Parity"
     var currentSize = DefaultSize
-    var ca = buildCa(currentRule, currentSize)
-    var view = new ScalaFxView[Int](new BinaryColorMap, currentSize, currentSize, CellPx)
+    var sim = buildSim(currentRule, currentSize)
     var paused = true
     var lastTickNs = 0L
 
     val canvasPane = new StackPane:
-      children = Seq(view.imageView)
+      children = Seq(sim.imageView)
 
     def updateTitle(): Unit =
-      stage.title = s"${ca.ruleName}: gen ${ca.generation}${
+      stage.title = s"${sim.ruleName}: gen ${sim.generation}${
           if paused then " (paused)" else ""
         }"
 
     def applyConfig(ruleName: String, size: Int): Unit =
       currentRule = ruleName
       currentSize = size
-      ca = buildCa(ruleName, size)
-      view = new ScalaFxView[Int](new BinaryColorMap, size, size, CellPx)
-      canvasPane.children = Seq(view.imageView)
+      sim = buildSim(ruleName, size)
+      canvasPane.children = Seq(sim.imageView)
       stage.scene.value.getWindow.sizeToScene()
-      view.render(ca.generation, ca.snapshot())
+      sim.render()
       updateTitle()
 
-    val ruleCombo = new ComboBox[String](ObservableBuffer("Parity", "Conway")):
-      value = "Parity"
-      prefWidth = 120
+    val ruleCombo =
+      new ComboBox[String](ObservableBuffer("Parity", "Conway", "Diffusion")):
+        value = "Parity"
+        prefWidth = 120
 
     val sizeSpinner = new Spinner[Int](MinSize, MaxSize, DefaultSize, SizeStep):
       editable = true
@@ -108,13 +145,13 @@ object AutomataApp extends JFXApp3:
     val timer = AnimationTimer { now =>
       if !paused && now - lastTickNs >= FrameNs then
         lastTickNs = now
-        ca.step()
-        view.render(ca.generation, ca.snapshot())
+        sim.step()
+        sim.render()
         updateTitle()
     }
 
     stage = new JFXApp3.PrimaryStage:
-      title = s"${ca.ruleName}: gen 0 (paused)"
+      title = s"${sim.ruleName}: gen 0 (paused)"
       scene = new Scene(DefaultSize * CellPx, DefaultSize * CellPx + ControlBarHeight):
         root = rootPane
         onKeyPressed = (e: KeyEvent) =>
@@ -123,10 +160,10 @@ object AutomataApp extends JFXApp3:
               paused = !paused
               updateTitle()
             case KeyCode.R =>
-              ca.init()
-              view.render(ca.generation, ca.snapshot())
+              sim.init()
+              sim.render()
               updateTitle()
             case _ => ()
 
-    view.render(ca.generation, ca.snapshot())
+    sim.render()
     timer.start()

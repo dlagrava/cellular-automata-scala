@@ -77,8 +77,8 @@ class RandomInitializer(maxValue: Int) extends BoardInitializer[Int] {
   }
 }
 
-class SquareInitializer(value: Int, size: Int) extends BoardInitializer[Int] {
-  override def initialize(board: Board[Int]): Unit = {
+class SquareInitializer[T](value: T, size: Int) extends BoardInitializer[T] {
+  override def initialize(board: Board[T]): Unit = {
     val middleX = board.width / 2
     val middleY = board.height / 2
     val squareIndexes =
